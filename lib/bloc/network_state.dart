@@ -1,7 +1,23 @@
-abstract class NetworkState {}
+import 'package:equatable/equatable.dart';
 
-class NetworkInitial extends NetworkState {}
+abstract class NetworkState extends Equatable {
+  const NetworkState(this.previous);
 
-class NetworkSuccess extends NetworkState {}
+  final NetworkState? previous;
 
-class NetworkFailure extends NetworkState {}
+  @override
+  List<Object> get props => [];
+}
+
+class NetworkInitial extends NetworkState {
+  const NetworkInitial() : super(null);
+}
+
+class NetworkSuccess extends NetworkState {
+  const NetworkSuccess(super.previous);
+}
+
+class NetworkFailure extends NetworkState {
+  final String message;
+  const NetworkFailure(super.previous, this.message);
+}
