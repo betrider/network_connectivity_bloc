@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:connectivity_checker/bloc/network_bloc.dart';
 import 'package:connectivity_checker/bloc/network_event.dart';
 import 'package:connectivity_checker/bloc/network_state.dart';
@@ -17,9 +19,7 @@ class App extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: BlocProvider(
-          create: (context) => NetworkBloc()..add(NetworkObserve()),
-          child: const Home()),
+      home: BlocProvider(create: (context) => NetworkBloc()..add(NetworkObserve()), child: const Home()),
     );
   }
 }
@@ -38,6 +38,18 @@ class _HomeState extends State<Home> {
       body: Center(
         child: BlocBuilder<NetworkBloc, NetworkState>(
           builder: (context, state) {
+            if (state.previous is NetworkSuccess && state is NetworkFailure) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                log('네트워크 연결이 끊어졌습니다.');
+              });
+            }
+
+            if (state.previous is NetworkFailure && state is NetworkSuccess) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                log('네트워크가 다시 연결되었습니다.');
+              });
+            }
+
             if (state is NetworkFailure) {
               return const Text("No Internet Connection");
             } else if (state is NetworkSuccess) {
